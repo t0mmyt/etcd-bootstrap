@@ -33,7 +33,7 @@ for k, v in m.items():
 for k in sorted(m.keys()):
     for e in filter(lambda x: len(x) > 0 and x[0:7] == 'export ',
                     sh.docker_machine('env', k).split('\n')):
-        environ[e[7:e.find('=')]] = e[e.find('=')+1:].rstrip('"').lstrip('"')
+        environ[e[7:e.find('=')]] = e[e.find('=')+1:].strip('"')
 
     print('Attempting to {} etcd on {} ({})'.format(action, k, m[k]))
     if action == 'start':
