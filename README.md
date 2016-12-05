@@ -2,7 +2,8 @@
 
 1. Read Makefile
 
-2.
+2. Run make
+
         ➜ make
         Attempting to start etcd on a (192.168.99.100)
         Attempting to start etcd on b (192.168.99.101)
