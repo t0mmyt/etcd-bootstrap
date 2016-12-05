@@ -23,10 +23,10 @@
 
 ## TODO:
 
-- [X] &#10003; Node restart
-- [X] &#10005; Node comes back with same name but otherwise different
-- [ ] Same node goes away and comes back without data
-- [ ] Node goes down hard and is replaced (differnt IP, no data)
+[X] &#10003; Node restart
+[X] &#10005; Node comes back with same name but otherwise different
+[ ] Same node goes away and comes back without data
+[ ] Node goes down hard and is replaced (different IP, no data)
 
 ## Notes:
 
