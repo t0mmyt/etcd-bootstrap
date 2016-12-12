@@ -37,6 +37,20 @@ for k, v in mchn.items():
 # Get list of nodes to do
 mchn_todo = sys.argv[2:] if len(sys.argv) > 2 else sorted(mchn.keys())
 
+def etcd_srv(ip, domain, name):
+    sh.docker('run', '-d', '--name', 'etcd',
+        '-p', '2379:2379', '-p', '2380:2380',
+        '-v', '/etc/ssl/certs/:/etc/ssl/certs',
+        ETCD, '--name', "{}.{}".format(name, domain),
+        '--advertise-client-urls', 'http://{}:2379'.format(ip),
+        '--initial-advertise-peer-urls', 'http://{}.{}:2380'.format(name,domain),
+        '--listen-peer-urls', 'http://0.0.0.0:2380'.format(name,domain),
+        '--listen-client-urls', 'http://0.0.0.0:2379',
+        '--discovery-srv', domain,
+        '--initial-cluster-state', 'new',
+    )
+
+
 for k in mchn_todo:
     for e in filter(lambda x: len(x) > 0 and x[0:7] == 'export ',
                     sh.docker_machine('env', k).split('\n')):
@@ -45,19 +59,20 @@ for k in mchn_todo:
     print('Attempting to {} etcd on {} ({})'.format(action, k, mchn[k]))
     if action == 'start':
         ip = mchn[k]
-        sh.docker('run', '-d', '--name', 'etcd',
-                  '-p', '2379:2379', '-p', '2380:2380',
-                  '-v', '/etc/ssl/certs/:/etc/ssl/certs',
-                  ETCD, '--name', k,
-                  '--advertise-client-urls', 'http://{}:2379'.format(ip),
-                  '--listen-client-urls', 'http://0.0.0.0:2379',
-                  '--initial-advertise-peer-urls', 'http://{}:2380'.format(ip),
-                  '--listen-peer-urls', 'http://0.0.0.0:2380',
-                  '--initial-cluster-token', 'etcd-test-cluster',
-                  '--discovery', discovery)
+        etcd_srv(ip, 'test.kube.usw.co', k)
     elif action == 'stop':
         sh.docker('rm', '-f', 'etcd')
 
+#sh.docker('run', '-d', '--name', 'etcd',
+#          '-p', '2379:2379', '-p', '2380:2380',
+#          '-v', '/etc/ssl/certs/:/etc/ssl/certs',
+#          ETCD, '--name', k,
+#          '--advertise-client-urls', 'http://{}:2379'.format(ip),
+#          '--listen-client-urls', 'http://0.0.0.0:2379',
+#          '--initial-advertise-peer-urls', 'http://{}:2380'.format(ip),
+#          '--listen-peer-urls', 'http://0.0.0.0:2380',
+#          '--initial-cluster-token', 'etcd-test-cluster',
+#          '--discovery', discovery)
 # # Alternate bootstrap if nodes known. (not using discovery)
 # sh.docker('run', '-d', '--name', 'etcd',
 #           '-p', '2379:2379', '-p', '2380:2380',
